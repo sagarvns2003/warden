@@ -8,6 +8,8 @@ import java.util.concurrent.Executors;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.integration.annotation.BridgeFrom;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.channel.PublishSubscribeChannel;
@@ -25,6 +27,11 @@ public class ChannelConfig {
 	@Bean(name = "getSecretInboundChannel")
 	public PublishSubscribeChannel getSecretInboundChannel() {
 		return MessageChannels.publishSubscribe(executor).getObject();
+	}
+
+	@Bean(name = "replySecretChannel")
+	public DirectChannel replySecretChannel() {
+		return new DirectChannel();
 	}
 
 	/* -- Start: Multicasting channel configuration ---- */
@@ -46,16 +53,18 @@ public class ChannelConfig {
 	}
 	/* -- End: Multicasting channel configuration ---- */
 
-	@Bean(name = "replySecretChannel")
-	public DirectChannel replySecretChannel() {
-		return new DirectChannel();
+	@Bean(name = "secretOutboundChannel")
+	public PublishSubscribeChannel secretOutboundChannel() {
+		return MessageChannels.publishSubscribe(executor).getObject();
 	}
 
-	
-/*
-	@Bean(name = "transformPersonTriggerChannel")
-	public PublishSubscribeChannel transformPersonTriggerChannel() {
-		return MessageChannels.publishSubscribe(executor).get();
+	@Bean(name = "outboundHttpRecoveryChannel")
+	public MessageChannel outboundHttpRecoveryChannel() {
+	    return new DirectChannel();
 	}
-*/
+	
+	@Bean(name = "expressionParser")
+	public ExpressionParser expressionParser() {
+		return new SpelExpressionParser();
+	}
 }

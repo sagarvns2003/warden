@@ -50,6 +50,7 @@ public class RetryConfig {
 	// @Bean
 	private SimpleRetryPolicy retryPolicy() {
 		
+		
 		SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy(retryMaxAttempts, Map.of(RuntimeException.class, true));
 		retryPolicy.setMaxAttempts(this.retryMaxAttempts);
 		return retryPolicy;

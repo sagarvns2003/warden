@@ -21,6 +21,7 @@ import org.springframework.integration.http.dsl.Http;
 import org.springframework.integration.http.inbound.HttpRequestHandlingMessagingGateway;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.MessagingException;
 import org.springframework.stereotype.Component;
 
 import io.github.sagarvns2003.warden.model.ServiceSecretPayload;
@@ -39,16 +40,12 @@ public class GetServiceSecretFlow_V1 {
 
 	private static final String SERVICE_SECRET_API = Constant.API_V1 + "/secret/{serviceId}";
 	private static final String[] REQUIRED_HEADERS = Constant.REQUIRED_HEADERS.stream().toArray(String[]::new);
-
-	
 	
 	@Autowired
 	private ExpressionParser expressionParser;
 	
 	@Autowired
 	private RequestHandlerRetryAdvice outboundHttpRequestHandlerRetryAdvice;
-	//@Autowired
-	//private ReceipentResponseErrorHandler receipentResponseErrorHandler;
 	
 	/*
 	 * GET API
@@ -135,32 +132,31 @@ public class GetServiceSecretFlow_V1 {
 						//.outboundGateway("http://localhost:8080/v1/api/job/recieve")
 						.httpMethod(HttpMethod.POST)
 						.expectedResponseType(String.class)
-						//.errorHandler(this.receipentResponseErrorHandler)
 						.extractPayload(true)
-						.extractResponseBody(true), e -> e.advice(this.outboundHttpRequestHandlerRetryAdvice)
-						//.getObject()
-						)
+						.extractResponseBody(true), e -> e.advice(this.outboundHttpRequestHandlerRetryAdvice))
 				.log(LoggingHandler.Level.INFO,
 						message -> MessageFormat.format("Response from the recipient url {0} is... {1}",
 								message.getHeaders().get(Constant.HEADER_RECIPIENT_URL.toLowerCase(), String.class),
 								(String) message.getPayload()))
-				.transform(Message.class, message -> {
+				/*.transform(Message.class, message -> {
 					logger.info("response: {}", message.getPayload());
 					return "";
-				})
+				})*/
 				.get();
-				//.channel("getSecretChannel").get();
 	}
 	
 	@Bean
 	public IntegrationFlow handleRecovery() {
 		return IntegrationFlow.from("outboundHttpRecoveryChannel")
-				.log(LoggingHandler.Level.ERROR, "error: ", m -> m.getPayload())
-				.transform(Message.class, message -> {
-					logger.info("outboundHttpRecoveryChannel: {}", message.getPayload());
-					return "";
+				//.log(LoggingHandler.Level.ERROR, "error: ", m -> m.getPayload())
+				.handle((payload, headers) -> {
+					if (MessagingException.class.isInstance(payload)) {
+						MessagingException me = MessagingException.class.cast(payload);
+						logger.error("Error occured: {}", me.getCause().getCause().getMessage());
+					}					
+					return Constant.BLANK;
 				})
-				.get();
+				.nullChannel();
 	}
 	
 	 /* 

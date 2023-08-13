@@ -39,7 +39,7 @@ public class GetServiceSecretFlow_V1 {
 	private static final Logger logger = LoggerFactory.getLogger(GetServiceSecretFlow_V1.class);
 
 	private static final String SERVICE_SECRET_API = Constant.API_V1 + "/secret/{serviceId}";
-	private static final String[] REQUIRED_HEADERS = Constant.REQUIRED_HEADERS.stream().toArray(String[]::new);
+	private static final String[] REQUIRED_HEADERS = Constant.REQUIRED_HEADERS.toArray(String[]::new);
 	
 	@Autowired
 	private ExpressionParser expressionParser;

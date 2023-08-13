@@ -12,6 +12,9 @@ import org.springframework.messaging.MessageHeaders;
 
 public class CommonUtil {
 
+	private CommonUtil(){
+	}
+
 	public static Map<String, Object> extractAllHeaders(MessageHeaders headers) {
 		if (null != headers && !headers.isEmpty()) {
 			return headers.entrySet().parallelStream().collect(Collectors.toMap(Entry::getKey, Entry::getValue));
@@ -38,7 +41,7 @@ public class CommonUtil {
 		if (StringUtils.isBlank(commaSeperatedString)) {
 			return List.of();
 		}
-		return Stream.of(commaSeperatedString.split(",")).map(String::strip).collect(Collectors.toList());
+		return Stream.of(commaSeperatedString.split(",")).map(String::strip).toList();
 	}
 
 }

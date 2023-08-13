@@ -1,6 +1,7 @@
 package io.github.sagarvns2003.warden.errorhandler;
 
 import java.io.IOException;
+import java.math.BigInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,8 +18,8 @@ public class RecipientResponseErrorHandler implements ResponseErrorHandler {
 	@Override
 	public boolean hasError(ClientHttpResponse clienthttpresponse) throws IOException {
 		if (clienthttpresponse.getStatusCode() != HttpStatus.OK) {
-			logger.info("Status code: " + clienthttpresponse.getStatusCode());
-			logger.info("Response" + clienthttpresponse.getStatusText());
+			logger.info("Status code: {}", clienthttpresponse.getStatusCode());
+			logger.info("Response {}", clienthttpresponse.getStatusText());
 			logger.info("{}", clienthttpresponse.getBody());
 
 			if (clienthttpresponse.getStatusCode() == HttpStatus.FORBIDDEN) {
@@ -26,6 +27,7 @@ public class RecipientResponseErrorHandler implements ResponseErrorHandler {
 				return true;
 			}
 		}
+				
 		return false;
 	}
 
